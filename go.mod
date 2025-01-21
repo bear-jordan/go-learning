@@ -1,3 +1,3 @@
-module github.com/bear-jordan/go-learning.git
+module learning
 
 go 1.23.5
