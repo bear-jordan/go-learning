@@ -1,10 +1,7 @@
 /*
 Author: Bear Jordan
 Description: Utility to color standard input
-Usage: Usage: `color -color=<color> [-verbose=true] <message>
-
-TODO:
-  - Add support for file input and output
+Usage: Usage: `color -color=<color> [-verbose=true] ( -file="foo" | <message> )
 */
 
 package main
@@ -28,10 +25,6 @@ func ParseArgs() (string, string, bool, bool) {
     flag.Parse()
 
     // Validate args
-    // If it's help or invalid, return
-    //  - if no message or file provided
-    //  - if both message or file provided
-
     hasHelp := *help
     bothMessages := flag.NArg() == 1 && *file != ""
     noMessages := flag.NArg() == 0 && *file == ""
@@ -39,10 +32,12 @@ func ParseArgs() (string, string, bool, bool) {
         return *selectedColor, "", *verbose, true
     }
 
+    // Process message
     var message string
     if flag.NArg() == 1 {
         message = flag.Arg(0)
     } else if *file != "" {
+        // Read file if provided
         data, err := os.ReadFile(*file)
         if err != nil {
             fmt.Fprintf(os.Stderr, fmt.Sprintf("No file found: `%s`", file))
