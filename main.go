@@ -2,6 +2,9 @@
 Author: Bear Jordan
 Description: Utility to color standard input
 Usage: Usage: `color -color=<color> [-verbose=true] <message>
+
+TODO:
+  - Add support for file input and output
 */
 
 package main
