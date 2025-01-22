@@ -12,19 +12,30 @@ func MakeMessage(color string, message string) string {
 
 }
 
-func ParseArgs() string {
+func ParseArgs() (string, string, bool) {
+    // Init flags
     selectedColor := flag.String("color", "white", "Color to display message")
+    verbose := flag.Bool("verbose", false, "Set verbosity")
     flag.Parse()
+    
+    // Check args are correct
+    if flag.NArg() != 1 {
+        fmt.Fprintf(os.Stderr, "Usage: `color -color=white [-verbose=true] <message>`\r\n")
+        os.Exit(1)
+    }
 
-    return *selectedColor
+    // Get message
+    message := flag.Arg(0)
+
+    return *selectedColor, message, *verbose
 }
 
 func main() {
     // Parse args
-    message := os.Args[2]
-    selectedColor := ParseArgs()
-
-    fmt.Fprint(os.Stderr, fmt.Sprintf("Picking a color: `%s`\r\n", selectedColor))
+    selectedColor, message, verbose := ParseArgs()
+    if verbose {
+        fmt.Fprint(os.Stderr, fmt.Sprintf("Picking a color: `%s`\r\n", selectedColor))
+    }
 
     // Define colors
     var validColors = map[string]string {
@@ -39,9 +50,12 @@ func main() {
     }
 
     // Pick a color
-    if color, ok := validColors[selectedColor]; ok {
-        fmt.Println(MakeMessage(color, message))
-    } else {
+    color, ok := validColors[selectedColor]
+    if !ok {
         fmt.Fprint(os.Stderr, "Color not found.\r\n")
+        color = validColors["white"]
     }
+    fmt.Println(MakeMessage(color, message))
+
+    os.Exit(0)
 }
