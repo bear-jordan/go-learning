@@ -1,15 +1,24 @@
 package colors
 
-import "fmt"
+import (
+    "fmt"
+    "os"
+)
 
+// Define a color -> ansii map
+type color struct {
+    name string
+    color string
+}
+
+
+func MakeMessage(color color) string {
+    return fmt.Sprintf("%s%s\033[0m", color.color, color.name)
+
+}
 
 func PrintColor() {
-    // Define a color -> ansii map
-    type color struct {
-        name string
-        color string
-    }
-
+    fmt.Fprint(os.Stderr, "Picking a color\r\n")
     // Define colors
     var colors = []color {
         {name: "black", color: "\033[0;30m"},
@@ -24,7 +33,7 @@ func PrintColor() {
 
     // Give a message (default to hello)
     for _, color := range colors {
-        var message = fmt.Sprintf("%s%s\033[0m", color.color, color.name)
+        message := MakeMessage(color)
         fmt.Println(message)
     }
     // Pick a color
