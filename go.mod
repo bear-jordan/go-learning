@@ -1,3 +1,3 @@
-module learning
+module color
 
 go 1.23.5
