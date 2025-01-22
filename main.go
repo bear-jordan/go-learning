@@ -24,19 +24,41 @@ func ParseArgs() (string, string, bool, bool) {
     selectedColor := flag.String("color", "white", "Color to display message")
     verbose := flag.Bool("verbose", false, "Set verbosity")
     help := flag.Bool("help", false, "Display help menu")
+    file := flag.String("file", "", "File to load")
     flag.Parse()
 
     // Validate args
-    if *help || flag.NArg() != 1 {
+    // If it's help or invalid, return
+    //  - if no message or file provided
+    //  - if both message or file provided
+
+    hasHelp := *help
+    bothMessages := flag.NArg() == 1 && *file != ""
+    noMessages := flag.NArg() == 0 && *file == ""
+    if hasHelp || bothMessages || noMessages {
         return *selectedColor, "", *verbose, true
     }
 
-    return *selectedColor, flag.Arg(0), *verbose, *help
+    var message string
+    if flag.NArg() == 1 {
+        message = flag.Arg(0)
+    } else if *file != "" {
+        data, err := os.ReadFile(*file)
+        if err != nil {
+            fmt.Fprintf(os.Stderr, fmt.Sprintf("No file found: `%s`", file))
+            os.Exit(1)
+        }
+        message = string(data)
+    } else {
+        panic("No valid option found.")
+    }
+
+    return *selectedColor, message, *verbose, *help
 }
 
 func ShowHelp(validColors map[string]string) {
     // Print out help menu
-    fmt.Fprintln(os.Stderr, "Usage: `color -color=<color> [-verbose=true] \"<message>\"`")
+    fmt.Fprintln(os.Stderr, "Usage: `color -color=<color> [-verbose=true] ( -file=\"<filepath>\" | \"<message>\" )`")
     fmt.Fprintln(os.Stderr, "\nValid colors:")
     for color := range validColors {
         fmt.Fprintf(os.Stderr, "  - %s\n", color)
